@@ -1,2 +1,21 @@
 ---
-# tasks file for correcthorse.duosecurity
+- name: set CentOS repo
+  set_fact:
+    duo_repo: CentOS
+  when: ansible_distribution == 'CentOS'
+
+- name: set RHEL repo
+  set_fact:
+    duo_repo: RedHat
+  when: ansible_distribution != 'CentOS'
+
+- name: install duosecurity key
+  rpm_key: key=https://www.duosecurity.com/RPM-GPG-KEY-DUO state=present
+
+- name: install repo
+  template: src=duosecurity.repo.j2  dest=/etc/yum.repos.d/duosecurity.repo owner=root group=root mode=0644
+
+- name: install duo
+  yum: name=duo_unix state=present
+
+
